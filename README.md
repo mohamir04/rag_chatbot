@@ -38,8 +38,8 @@ This project implements a Retrieval Augmented Generation (RAG) API using FastAPI
 
 1.  **Clone the repository** (if applicable):
     ```bash
-    git clone <repository_url>
-    cd <repository_directory>
+    git clone https://github.com/mohamir04/rag_chatbot
+    cd rag_chatbot
     ```
 
 2.  **Create and activate a virtual environment**:
