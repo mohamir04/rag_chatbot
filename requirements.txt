@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pinecone
+groq
+python-dotenv
+pydantic
+aiofiles
+pypdf2
+httpx
+beautifulsoup4 
