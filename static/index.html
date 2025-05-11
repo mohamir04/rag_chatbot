@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG UI - Advanced Layout</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden; 
+        }
+        header {
+            background-color: #4A90E2;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000; 
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .app-container {
+            display: flex;
+            flex-grow: 1; 
+            width: 100%;
+            max-width: 1600px; 
+            margin: 20px auto; 
+            overflow: hidden; 
+        }
+
+        .chat-area {
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-right: 10px; 
+            overflow-y: hidden; 
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            overflow-y: auto; 
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+            max-width: 75%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: #0084ff; 
+            color: white;
+            margin-left: auto; 
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            background-color: #e4e6eb; 
+            color: #050505;
+            margin-right: auto; 
+            border-bottom-left-radius: 5px;
+        }
+        .bot-message .sources-list {
+            font-size: 0.8em;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #d1d1d1;
+            color: #357ABD; 
+        }
+        .bot-message .sources-list strong {
+            color: #1c1e21;
+        }
+        .bot-message .sources-list ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 5px 0 0 0;
+        }
+        .bot-message .sources-list li {
+            margin-bottom: 3px;
+        }
+        .bot-message .sources-list a {
+            color: #357ABD;
+            text-decoration: none;
+        }
+        .bot-message .sources-list a:hover {
+            text-decoration: underline;
+        }
+        .bot-message .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .chat-input-form textarea {
+            flex-grow: 1;
+            resize: none; 
+            height: 40px; 
+            padding: 10px;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        .chat-input-form button {
+            min-width: 80px; 
+        }
+
+        .sidebar {
+            width: 320px; 
+            min-width: 300px; 
+            padding: 20px;
+            background-color: #f7f7f7; 
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow-y: auto; 
+            max-height: calc(100vh - 40px - 70px); 
+        }
+        .sidebar .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .sidebar h2 {
+            font-size: 1.3em;
+            color: #4A90E2;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 0.95em; }
+        input[type="text"], input[type="file"], input[type="url"], input[type="number"], textarea {
+            width: calc(100% - 24px); padding: 10px; margin-bottom: 15px; border: 1px solid #ccd0d5;
+            border-radius: 6px; font-size: 0.9em; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        input[type="file"] { padding: 8px; }
+        textarea:not(.chat-textarea) { resize: vertical; min-height: 60px; }
+        input:focus, textarea:focus { border-color: #4A90E2; box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2); outline: none; }
+        button[type="submit"] {
+            background-color: #4A90E2; color: white; padding: 10px 15px; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 0.95em; font-weight: 600; transition: background-color 0.2s ease-in-out;
+        }
+        button[type="submit"]:hover { background-color: #357ABD; }
+        .loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4A90E2; border-radius: 50%;
+            width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 10px auto; display: none;
+        }
+        .status-message { padding: 8px 12px; border-radius: 4px; margin-top: 10px; font-weight: 500; font-size: 0.9em; }
+        .status-success { background-color: #e6ffed; border: 1px solid #b7ebc2; color: #257938; }
+        .status-error { background-color: #ffebee; border: 1px solid #ffcdd2; color: #c62828; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        footer {
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.85em;
+            color: #606770;
+            width: 100%;
+            border-top: 1px solid #e0e0e0;
+            background-color: #f0f2f5; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Intelligent RAG Assistant</h1>
+    </header>
+
+    <div class="app-container">
+        <div class="chat-area">
+            <div class="messages-container" id="messagesContainer"> 
+                <!-- Chat messages will appear here -->
+            </div>
+            <div id="chatLoading" class="loading-spinner" style="display: none; margin: 5px auto;"></div>
+            <form id="chatForm" class="chat-input-form">
+                <textarea id="query" name="query" rows="1" placeholder="Ask your question..." required class="chat-textarea"></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <aside class="sidebar">
+            <div class="container">
+                <h2>Upload PDF</h2>
+                <form id="pdfForm">
+                    <label for="pdfFile">Choose PDF file:</label>
+                    <input type="file" id="pdfFile" name="file" accept=".pdf" required>
+                    <button type="submit">Upload PDF</button>
+                </form>
+                <div id="pdfLoading" class="loading-spinner"></div>
+                <div id="pdfStatus" class="status-message"></div>
+            </div>
+
+            <div class="container">
+                <h2>HTML Website URL</h2>
+                <form id="urlForm">
+                    <label for="urlInput">Enter URL:</label>
+                    <input type="url" id="urlInput" name="url" placeholder="https://example.com" required>
+                    <button type="submit">Fetch & Upload URL</button>
+                </form>
+                <div id="urlLoading" class="loading-spinner"></div>
+                <div id="urlStatus" class="status-message"></div>
+            </div>
+        </aside>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 RAG Application</p>
+    </footer>
+
+    <script>
+        // --- Utility Functions ---
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') {
+                console.warn('escapeHtml called with non-string value:', unsafe);
+                return '';
+            }
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // --- DOM Elements ---
+        const pdfForm = document.getElementById('pdfForm');
+        const pdfStatusDiv = document.getElementById('pdfStatus');
+        const pdfSpinner = document.getElementById('pdfLoading');
+
+        const urlForm = document.getElementById('urlForm');
+        const urlStatusDiv = document.getElementById('urlStatus');
+        const urlSpinner = document.getElementById('urlLoading');
+
+        const chatForm = document.getElementById('chatForm');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const queryInput = document.getElementById('query');
+        // const topKInput = document.getElementById('top_k'); // No longer needed
+        const chatSpinner = document.getElementById('chatLoading');
+
+        // --- Event Listeners & Handlers ---
+
+        // PDF Upload
+        pdfForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            pdfSpinner.style.display = 'block';
+            pdfStatusDiv.textContent = 'Uploading PDF...';
+            pdfStatusDiv.className = 'status-message'; // Reset class
+            const formData = new FormData(pdfForm);
+            try {
+                const response = await fetch('/upload-pdf/', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    pdfStatusDiv.textContent = `Success: ${escapeHtml(result.message)} (File: ${escapeHtml(result.filename)}, Pages: ${result.total_pages_processed})`;
+                    pdfStatusDiv.classList.add('status-success');
+                } else {
+                    pdfStatusDiv.textContent = `Error ${response.status}: ${escapeHtml(result.detail || 'Failed to upload PDF.')}`;
+                    pdfStatusDiv.classList.add('status-error');
+                }
+            } catch (error) {
+                pdfStatusDiv.textContent = 'Network Error: ' + escapeHtml(error.message);
+                pdfStatusDiv.classList.add('status-error');
+            } finally {
+                pdfSpinner.style.display = 'none';
+                pdfForm.reset();
+            }
+        });
+
+        // URL Upload
+        urlForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            urlSpinner.style.display = 'block';
+            urlStatusDiv.textContent = 'Fetching URL...';
+            urlStatusDiv.className = 'status-message'; // Reset class
+            const url = document.getElementById('urlInput').value;
+            try {
+                const response = await fetch('/upload-url/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    urlStatusDiv.textContent = `Success: ${escapeHtml(result.message)} (URL: ${escapeHtml(result.url)}, Length: ${result.content_length})`;
+                    urlStatusDiv.classList.add('status-success');
+                } else {
+                    urlStatusDiv.textContent = `Error ${response.status}: ${escapeHtml(result.detail || 'Failed to process URL.')}`;
+                    urlStatusDiv.classList.add('status-error');
+                }
+            } catch (error) {
+                urlStatusDiv.textContent = 'Network Error: ' + escapeHtml(error.message);
+                urlStatusDiv.classList.add('status-error');
+            } finally {
+                urlSpinner.style.display = 'none';
+                urlForm.reset();
+            }
+        });
+
+        // Chat Functionality
+        chatForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const userQuery = queryInput.value.trim();
+            if (!userQuery) return;
+
+            chatSpinner.style.display = 'block';
+            appendMessage(userQuery, 'user-message');
+            queryInput.value = ''; // Clear input field
+
+            let llmAnswerStarted = false;
+            let sourcesData = null;
+            let currentBotMessageDiv = null;
+            let buffer = '';
+
+            function processStreamChunk(textChunk) {
+                buffer += textChunk;
+                if (!llmAnswerStarted) {
+                    const separatorIndex = buffer.indexOf('\n###LLM_ANSWER###\n');
+                    if (separatorIndex !== -1) {
+                        const jsonPart = buffer.substring(0, separatorIndex);
+                        const llmInitialPart = buffer.substring(separatorIndex + '\n###LLM_ANSWER###\n'.length);
+                        try {
+                            sourcesData = JSON.parse(jsonPart).sources;
+                        } catch (e) {
+                            console.error('Error parsing sources JSON:', e, '\nJSON part:', jsonPart);
+                            appendMessage('Error processing document sources.', 'bot-message error-message');
+                            // Don't create currentBotMessageDiv here, as we might only have an error.
+                        }
+                        llmAnswerStarted = true;
+                        buffer = llmInitialPart; // Carry over the initial part of LLM answer
+                        // Now that sources are processed (or failed), create the bot message div for LLM content
+                        if (buffer.trim() || (sourcesData && sourcesData.length > 0)) { // Only create if there's content or sources
+                           currentBotMessageDiv = appendMessage('', 'bot-message', sourcesData); // Create with sources
+                        }
+                        if (currentBotMessageDiv && buffer.trim()) {
+                            if (buffer.startsWith("Error from LLM:")) {
+                                currentBotMessageDiv.querySelector('.content').innerHTML = `<span class="error-message">${escapeHtml(buffer)}</span>`;
+                            } else {
+                                currentBotMessageDiv.querySelector('.content').innerHTML = escapeHtml(buffer);
+                            }
+                        }
+                        buffer = ''; // Clear buffer after processing initial LLM part
+                    }
+                } else {
+                    // LLM answer stream is ongoing
+                    if (!currentBotMessageDiv) {
+                        currentBotMessageDiv = appendMessage('', 'bot-message', sourcesData);
+                    }
+                     const contentDiv = currentBotMessageDiv.querySelector('.content');
+                    if (textChunk.startsWith("Error from LLM:")) {
+                        contentDiv.innerHTML += `<br><span class="error-message">${escapeHtml(textChunk)}</span>`;
+                    } else {
+                        contentDiv.innerHTML += escapeHtml(textChunk);
+                    }
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            try {
+                const response = await fetch('/chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: userQuery })  
+                });
+
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    appendMessage(`API Error ${response.status}: ${escapeHtml(errorResult.detail || 'Failed to get chat response.')}`, 'bot-message error-message');
+                    chatSpinner.style.display = 'none';
+                    return;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                function readStream() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            chatSpinner.style.display = 'none';
+                            if (!currentBotMessageDiv && !llmAnswerStarted && sourcesData && sourcesData.length === 0) {
+                                appendMessage("No specific context found and no answer generated.", 'bot-message');
+                            } else if (!currentBotMessageDiv && !llmAnswerStarted && !sourcesData){
+                                appendMessage("No response from LLM and no sources found.", 'bot-message');
+                            }
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            return;
+                        }
+                        const textChunk = decoder.decode(value, { stream: true });
+                        processStreamChunk(textChunk);
+                        readStream();
+                    }).catch(error => {
+                        console.error('Stream reading error:', error);
+                        appendMessage('Error reading stream: ' + escapeHtml(error.message), 'bot-message error-message');
+                        chatSpinner.style.display = 'none';
+                    });
+                }
+                readStream();
+
+            } catch (error) {
+                appendMessage('Network Error: ' + escapeHtml(error.message), 'bot-message error-message');
+                chatSpinner.style.display = 'none';
+            }
+        });
+
+        function appendMessage(text, className, sources = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', className);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('content');
+            contentDiv.innerHTML = escapeHtml(text); 
+            messageDiv.appendChild(contentDiv);
+
+            if (sources && sources.length > 0) {
+                const sourcesListDiv = document.createElement('div');
+                sourcesListDiv.classList.add('sources-list');
+                let sourcesHtml = '<strong>Sources:</strong><ul>';
+                sources.forEach(src => {
+                    let sourceText = src.is_url ? `<a href="${escapeHtml(src.source)}" target="_blank">${escapeHtml(src.source)}</a>` : escapeHtml(src.source);
+                    if (!src.is_url && src.pages && src.pages.length > 0) {
+                        sourceText += `, Page(s): ${src.pages.map(p => escapeHtml(String(p))).join(', ')}`;
+                    }
+                    sourcesHtml += `<li>${sourceText}</li>`;
+                });
+                sourcesHtml += '</ul>';
+                sourcesListDiv.innerHTML = sourcesHtml;
+                messageDiv.appendChild(sourcesListDiv);
+            }
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return messageDiv; 
+        }
+
+        queryInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+    </script>
+</body>
+</html> 
