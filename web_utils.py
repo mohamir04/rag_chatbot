@@ -75,16 +75,3 @@ class WebContentFetcher:
         except Exception as e:
             print(f"Error fetching content from {url}: {type(e).__name__} - {str(e)}")
             return f"Error: An unexpected error occurred while fetching the webpage ({str(e)})"
-
-# Example usage (optional, for testing)
-async def main_test():
-    fetcher = WebContentFetcher()
-    content = await fetcher.fetch_and_parse("https://example.com")
-    if not content.startswith("Error:"):
-        print("\nFetched Content Snippet:")
-        print(content[:500])
-    else:
-        print(f"\n{content}")
-
-if __name__ == '__main__':
-    asyncio.run(main_test()) 
